@@ -1,0 +1,22 @@
+[workspace]
+members = [
+    "apps/winghost",
+    "crates/pty-windows",
+    "crates/renderer",
+    "crates/terminal-core",
+]
+resolver = "2"
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+license = "MIT"
+repository = "https://github.com/Ravshan04/WinGhost"
+rust-version = "1.85"
+
+[workspace.lints.rust]
+unsafe_code = "forbid"
+
+[workspace.lints.clippy]
+all = { level = "warn", priority = -1 }
+pedantic = { level = "warn", priority = -1 }

@@ -1,0 +1,33 @@
+name: Release artifact (placeholder)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  portable-artifact:
+    runs-on: windows-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: "1.85"
+      - name: Build release binary
+        run: cargo build --release -p winghost
+      - name: Stage portable artifact
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Path dist/WinGhost | Out-Null
+          Copy-Item target/release/winghost.exe dist/WinGhost/
+          Copy-Item README.md,LICENSE dist/WinGhost/
+          Compress-Archive -Path dist/WinGhost -DestinationPath dist/WinGhost-windows-x64.zip
+      - name: Upload unsigned development artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: WinGhost-windows-x64-unsigned
+          path: dist/WinGhost-windows-x64.zip
+          if-no-files-found: error

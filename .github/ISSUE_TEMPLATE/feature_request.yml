@@ -1,0 +1,26 @@
+name: Feature proposal
+description: Propose a focused user-facing improvement
+title: "[Proposal]: "
+labels: [proposal, needs-triage]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: User problem
+      description: Describe the workflow or limitation before proposing a solution.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behavior
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+  - type: textarea
+    id: windows
+    attributes:
+      label: Windows integration considerations

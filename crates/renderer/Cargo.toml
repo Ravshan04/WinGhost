@@ -1,0 +1,13 @@
+[package]
+name = "renderer"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+terminal-core = { path = "../terminal-core" }
+
+[lints]
+workspace = true

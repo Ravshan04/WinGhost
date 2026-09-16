@@ -1,0 +1,15 @@
+[package]
+name = "winghost"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+pty-windows = { path = "../../crates/pty-windows" }
+renderer = { path = "../../crates/renderer" }
+terminal-core = { path = "../../crates/terminal-core" }
+
+[lints]
+workspace = true

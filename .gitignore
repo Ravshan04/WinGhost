@@ -1,0 +1,8 @@
+/target/
+/.idea/
+/.vscode/
+*.user
+*.suo
+*.pdb
+*.log
+.DS_Store
