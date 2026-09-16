@@ -29,7 +29,8 @@ Automated end-to-end lifecycle coverage remains before the milestone is closed.
 ## Milestone 2 — Terminal correctness
 
 - [ ] Expand VT/ANSI coverage using documented compatibility fixtures.
-- [ ] Implement scrollback, selection, copy/paste, search, and hyperlinks.
+- [x] Implement scrollback navigation, copy-screen, and paste.
+- [ ] Implement drag selection, search, and hyperlinks.
 - [ ] Add Unicode grapheme, width, emoji, IME, and bidirectional-text tests.
 - [ ] Handle alternate screen, mouse reporting, bracketed paste, and common TUIs.
 - [ ] Publish a compatibility matrix and known limitations.
@@ -38,10 +39,12 @@ Exit condition: PowerShell, cmd.exe, WSL, SSH, and representative TUIs work reli
 
 ## Milestone 3 — Windows product experience
 
-- [ ] Add profiles, tabs, split panes, command palette, and key binding editor.
+- [x] Add profiles, tabs, and split panes.
+- [ ] Add a command palette and key binding editor.
 - [ ] Follow system light/dark, scaling, accessibility, and reduced-motion settings.
 - [ ] Add font fallback, themes, background opacity, and careful acrylic support.
-- [ ] Define configuration schema, validation, migration, and live reload.
+- [x] Define the first persistent configuration schema and settings UI.
+- [ ] Add schema migration and live reload for external edits.
 - [ ] Add crash recovery without silently restoring sensitive session contents.
 
 Exit condition: the application is comfortable as a daily terminal for early adopters.

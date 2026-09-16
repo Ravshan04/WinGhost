@@ -18,6 +18,65 @@ impl fmt::Display for SessionError {
 
 impl std::error::Error for SessionError {}
 
+/// Shell profiles offered by the Windows application.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ShellProfile {
+    PowerShell7,
+    WindowsPowerShell,
+    CommandPrompt,
+}
+
+impl ShellProfile {
+    pub const ALL: [Self; 3] = [
+        Self::PowerShell7,
+        Self::WindowsPowerShell,
+        Self::CommandPrompt,
+    ];
+
+    #[must_use]
+    pub const fn id(self) -> &'static str {
+        match self {
+            Self::PowerShell7 => "powershell7",
+            Self::WindowsPowerShell => "windows-powershell",
+            Self::CommandPrompt => "cmd",
+        }
+    }
+
+    #[must_use]
+    pub const fn display_name(self) -> &'static str {
+        match self {
+            Self::PowerShell7 => "PowerShell 7",
+            Self::WindowsPowerShell => "Windows PowerShell",
+            Self::CommandPrompt => "Command Prompt",
+        }
+    }
+
+    #[must_use]
+    pub fn from_id(id: &str) -> Self {
+        match id {
+            "powershell7" if powershell7_path().is_some() => Self::PowerShell7,
+            "cmd" => Self::CommandPrompt,
+            _ => Self::WindowsPowerShell,
+        }
+    }
+
+    #[must_use]
+    pub fn is_available(self) -> bool {
+        !matches!(self, Self::PowerShell7) || powershell7_path().is_some()
+    }
+
+    fn command(self) -> (String, &'static [&'static str]) {
+        match self {
+            Self::PowerShell7 => (
+                powershell7_path().unwrap_or_else(|| "pwsh.exe".to_owned()),
+                &["-NoLogo"],
+            ),
+            Self::WindowsPowerShell => ("powershell.exe".to_owned(), &["-NoLogo"]),
+            Self::CommandPrompt => ("cmd.exe".to_owned(), &["/Q"]),
+        }
+    }
+}
+
 /// A running shell connected to a native pseudoconsole.
 pub struct Session {
     master: Box<dyn MasterPty + Send>,
@@ -27,21 +86,27 @@ pub struct Session {
 }
 
 impl Session {
-    /// Starts the preferred Windows `PowerShell` executable in a pseudoconsole.
+    /// Starts the selected Windows shell profile in a pseudoconsole.
     ///
     /// # Errors
     ///
     /// Returns an error when the pseudoconsole, shell process, I/O handles, or
     /// worker threads cannot be created.
-    pub fn spawn_default(columns: u16, rows: u16) -> Result<Self, SessionError> {
-        let shell = preferred_shell();
+    pub fn spawn_profile(
+        profile: ShellProfile,
+        columns: u16,
+        rows: u16,
+    ) -> Result<Self, SessionError> {
+        let (shell, arguments) = profile.command();
         let pty_system = native_pty_system();
         let pair = pty_system
             .openpty(pty_size(columns, rows, 0, 0))
             .map_err(|error| SessionError(format!("Could not create ConPTY: {error}")))?;
 
         let mut command = CommandBuilder::new(&shell);
-        command.arg("-NoLogo");
+        for argument in arguments {
+            command.arg(argument);
+        }
         command.env("TERM", "xterm-256color");
         command.env("COLORTERM", "truecolor");
         if let Ok(directory) = std::env::current_dir() {
@@ -142,12 +207,12 @@ fn pty_size(columns: u16, rows: u16, pixel_width: u16, pixel_height: u16) -> Pty
     }
 }
 
-fn preferred_shell() -> String {
+fn powershell7_path() -> Option<String> {
     let modern = std::path::Path::new(r"C:\Program Files\PowerShell\7\pwsh.exe");
     if modern.is_file() {
-        modern.to_string_lossy().into_owned()
+        Some(modern.to_string_lossy().into_owned())
     } else {
-        "powershell.exe".to_owned()
+        None
     }
 }
 

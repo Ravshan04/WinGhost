@@ -10,7 +10,9 @@ rust-version.workspace = true
 eframe = { version = "0.31.1", default-features = false, features = ["glow", "wayland", "x11"] }
 pty-windows = { path = "../../crates/pty-windows" }
 renderer = { path = "../../crates/renderer" }
+serde = { version = "1.0", features = ["derive"] }
 terminal-core = { path = "../../crates/terminal-core" }
+toml = "0.8"
 
 [lints]
 workspace = true

@@ -23,6 +23,8 @@ jobs:
           components: clippy,rustfmt
       - name: Cache Rust build
         uses: Swatinem/rust-cache@v2
+      - name: Resolve dependency lockfile
+        run: cargo generate-lockfile
       - name: Check formatting
         run: cargo fmt --all -- --check
       - name: Lint

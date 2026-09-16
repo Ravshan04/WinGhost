@@ -107,14 +107,43 @@ impl Terminal {
     /// Creates an empty terminal grid with the requested scrollback capacity.
     #[must_use]
     pub fn new(columns: u16, rows: u16) -> Self {
+        Self::with_scrollback(columns, rows, 10_000)
+    }
+
+    /// Creates an empty grid with an explicit scrollback capacity.
+    #[must_use]
+    pub fn with_scrollback(columns: u16, rows: u16, scrollback_lines: usize) -> Self {
         Self {
-            parser: vt100::Parser::new(rows, columns, 10_000),
+            parser: vt100::Parser::new(rows, columns, scrollback_lines),
         }
     }
 
     /// Feeds bytes received from the pseudoconsole into the state machine.
     pub fn process(&mut self, bytes: &[u8]) {
         self.parser.process(bytes);
+    }
+
+    /// Moves the visible viewport upward into retained scrollback.
+    pub fn scroll_up(&mut self, lines: usize) {
+        let offset = self.parser.screen().scrollback().saturating_add(lines);
+        self.parser.set_scrollback(offset);
+    }
+
+    /// Moves the visible viewport toward the live terminal screen.
+    pub fn scroll_down(&mut self, lines: usize) {
+        let offset = self.parser.screen().scrollback().saturating_sub(lines);
+        self.parser.set_scrollback(offset);
+    }
+
+    /// Returns the number of rows between the viewport and the live screen.
+    #[must_use]
+    pub fn scrollback_offset(&self) -> usize {
+        self.parser.screen().scrollback()
+    }
+
+    /// Returns the viewport to the live terminal screen.
+    pub fn scroll_to_bottom(&mut self) {
+        self.parser.set_scrollback(0);
     }
 
     /// Returns the terminal width and height in character cells.

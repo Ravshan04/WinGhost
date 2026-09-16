@@ -28,11 +28,15 @@ source code or design assets.
 - VT/ANSI parsing, 16/256/true-color output, cursor, and basic text attributes.
 - Text input, paste, Ctrl+A–Z, arrows, navigation keys, and F1–F12.
 - Live terminal-grid and pseudoconsole resize.
-- Restart session and copy the visible screen from the toolbar.
+- Tabs with independent shell sessions.
+- Up to four vertical or horizontal split panes per tab.
+- Scrollback navigation with toolbar buttons or Shift+PageUp/PageDown.
+- Persistent font, theme, scrollback, and default-profile settings.
+- PowerShell 7, Windows PowerShell, and Command Prompt profiles.
+- Portable ZIP and a Windows Setup executable.
 
-Still planned: tabs, split panes, mouse reporting, scrollback UI, selectable text,
-profiles, configuration, font fallback, signed installer, and deeper compatibility
-testing.
+Still planned: mouse reporting, drag-select text, nested split trees, font fallback,
+code signing, and deeper compatibility testing.
 
 ## Non-goals for the first release
 
