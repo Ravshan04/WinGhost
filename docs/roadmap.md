@@ -16,14 +16,15 @@ intended system boundaries.
 
 ## Milestone 1 — Interactive vertical slice
 
-- [ ] Create, resize, and close a ConPTY session safely.
-- [ ] Launch a configured PowerShell profile.
-- [ ] Parse a deliberately small VT subset into a screen grid.
-- [ ] Open a native Windows window and render monospace text.
-- [ ] Send keyboard input to the child process.
+- [x] Create, resize, and close a ConPTY session safely.
+- [x] Launch PowerShell 7 with a Windows PowerShell fallback.
+- [x] Parse VT/ANSI output into a screen grid.
+- [x] Open a Windows window and render colored monospace text.
+- [x] Send text, paste, navigation, function, and control-key input to the child.
 - [ ] Add end-to-end smoke tests for startup and clean shutdown.
 
-Exit condition: a developer can open one window, run commands, resize it, and exit.
+Current result: a developer can open one window, run commands, resize it, and exit.
+Automated end-to-end lifecycle coverage remains before the milestone is closed.
 
 ## Milestone 2 — Terminal correctness
 

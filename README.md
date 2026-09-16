@@ -1,6 +1,7 @@
 # WinGhost
 
-> **Status:** early design and scaffolding. There is no usable terminal build yet.
+> **Status:** experimental Windows MVP. It opens a real PowerShell session through
+> ConPTY, but it is not ready to replace a mature terminal yet.
 
 WinGhost is a working name for an original, Windows-first terminal emulator. The
 project aims to combine fast GPU-rendered text, native Windows integration, and a
@@ -19,6 +20,19 @@ source code or design assets.
 - Support tabs, split panes, profiles, search, links, and configurable key bindings.
 - Keep terminal parsing and state independent from the Windows UI and renderer.
 - Make startup, input latency, memory use, and compatibility measurable.
+
+## What works today
+
+- Native desktop window with a GPU-backed `egui` renderer.
+- Interactive PowerShell 7 or Windows PowerShell session through ConPTY.
+- VT/ANSI parsing, 16/256/true-color output, cursor, and basic text attributes.
+- Text input, paste, Ctrl+A–Z, arrows, navigation keys, and F1–F12.
+- Live terminal-grid and pseudoconsole resize.
+- Restart session and copy the visible screen from the toolbar.
+
+Still planned: tabs, split panes, mouse reporting, scrollback UI, selectable text,
+profiles, configuration, font fallback, signed installer, and deeper compatibility
+testing.
 
 ## Non-goals for the first release
 
@@ -47,9 +61,8 @@ cargo test --workspace
 cargo run -p winghost
 ```
 
-The current binary only confirms that the workspace is wired correctly. It does
-not open a terminal window yet. See the [roadmap](docs/roadmap.md) for the path to
-the first interactive prototype.
+Running the binary opens the WinGhost window and starts PowerShell. See the
+[roadmap](docs/roadmap.md) for limitations and upcoming milestones.
 
 ## Principles
 

@@ -31,3 +31,9 @@ jobs:
         run: cargo test --workspace
       - name: Build
         run: cargo build --workspace
+      - name: Preserve resolved dependency lockfile
+        uses: actions/upload-artifact@v4
+        with:
+          name: cargo-lock
+          path: Cargo.lock
+          if-no-files-found: error

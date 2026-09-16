@@ -6,5 +6,8 @@ license.workspace = true
 repository.workspace = true
 rust-version.workspace = true
 
+[dependencies]
+vt100 = "0.15.2"
+
 [lints]
 workspace = true
