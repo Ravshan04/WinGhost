@@ -17,7 +17,7 @@ jobs:
         with:
           toolchain: "1.88"
       - name: Build release binary
-        run: cargo build --release -p winghost
+        run: cargo build --release --locked -p winghost
       - name: Stage portable artifact
         shell: pwsh
         run: |
