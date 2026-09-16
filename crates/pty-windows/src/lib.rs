@@ -1,6 +1,6 @@
 //! Windows pseudoconsole boundary.
 //!
-//! ConPTY calls will be added behind this crate's public API during Milestone 1.
+//! `ConPTY` calls will be added behind this crate's public API during Milestone 1.
 
 use std::fmt;
 
