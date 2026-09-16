@@ -4,7 +4,7 @@
 
 - Windows 11 or a supported Windows 10 version with ConPTY.
 - Visual Studio Build Tools with the Desktop development with C++ workload.
-- Rust 1.85 or newer using the MSVC host toolchain.
+- Rust 1.88 or newer using the MSVC host toolchain.
 - Git and PowerShell 7 are recommended.
 
 ## Build and test

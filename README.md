@@ -53,7 +53,7 @@ docs/                   Product, architecture, development, and roadmap notes
 
 ## Quick start
 
-The scaffold requires Rust 1.85 or newer. On Windows with the Rust MSVC toolchain:
+The project requires Rust 1.88 or newer. On Windows with the Rust MSVC toolchain:
 
 ```powershell
 cargo build --workspace

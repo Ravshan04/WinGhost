@@ -15,7 +15,7 @@ jobs:
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
-          toolchain: "1.85"
+          toolchain: "1.88"
       - name: Build release binary
         run: cargo build --release -p winghost
       - name: Stage portable artifact
