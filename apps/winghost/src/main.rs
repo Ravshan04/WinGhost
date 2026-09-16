@@ -57,7 +57,7 @@ impl WinGhostApp {
         match Session::spawn_default(self.size.0, self.size.1) {
             Ok(session) => {
                 self.session = Some(session);
-                self.status = "PowerShell • ConPTY".to_owned();
+                "PowerShell • ConPTY".clone_into(&mut self.status);
             }
             Err(error) => {
                 self.session = None;
@@ -104,8 +104,8 @@ impl WinGhostApp {
     }
 
     fn resize(&mut self, available: egui::Vec2) {
-        let columns = ((available.x / CELL_WIDTH).floor() as u16).clamp(20, 300);
-        let rows = ((available.y / CELL_HEIGHT).floor() as u16).clamp(5, 150);
+        let columns = bounded_cell_count(available.x, CELL_WIDTH, 20, 300);
+        let rows = bounded_cell_count(available.y, CELL_HEIGHT, 5, 150);
         if self.size == (columns, rows) {
             return;
         }
@@ -113,13 +113,21 @@ impl WinGhostApp {
         self.size = (columns, rows);
         self.terminal.resize(columns, rows);
         if let Some(session) = &self.session {
-            let pixel_width = (f32::from(columns) * CELL_WIDTH).round() as u16;
-            let pixel_height = (f32::from(rows) * CELL_HEIGHT).round() as u16;
+            let pixel_width = columns.saturating_mul(9);
+            let pixel_height = rows.saturating_mul(19);
             if let Err(error) = session.resize(columns, rows, pixel_width, pixel_height) {
                 self.status = error.to_string();
             }
         }
     }
+}
+
+#[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
+fn bounded_cell_count(available: f32, cell_size: f32, minimum: u16, maximum: u16) -> u16 {
+    // Clamp before casting so the finite value is always within the u16 range.
+    (available / cell_size)
+        .floor()
+        .clamp(f32::from(minimum), f32::from(maximum)) as u16
 }
 
 impl eframe::App for WinGhostApp {
