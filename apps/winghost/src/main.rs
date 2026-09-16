@@ -169,7 +169,6 @@ fn terminal_layout(snapshot: &ScreenSnapshot, theme: Theme) -> LayoutJob {
     let mut job = LayoutJob::default();
     job.wrap.max_width = f32::INFINITY;
     job.break_on_newline = true;
-    job.keep_trailing_whitespace = true;
 
     for row in 0..snapshot.rows {
         for column in 0..snapshot.columns {
