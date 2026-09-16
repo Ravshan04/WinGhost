@@ -24,11 +24,50 @@ pub struct Cell {
     pub contents: String,
     pub foreground: TerminalColor,
     pub background: TerminalColor,
-    pub bold: bool,
-    pub italic: bool,
-    pub underline: bool,
-    pub inverse: bool,
+    pub style: CellStyle,
     pub wide_continuation: bool,
+}
+
+/// Compact text attributes applied to a terminal cell.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
+pub struct CellStyle(u8);
+
+impl CellStyle {
+    const BOLD: u8 = 1 << 0;
+    const ITALIC: u8 = 1 << 1;
+    const UNDERLINE: u8 = 1 << 2;
+    const INVERSE: u8 = 1 << 3;
+
+    #[must_use]
+    pub const fn new(attributes: [bool; 4]) -> Self {
+        let [bold, italic, underline, inverse] = attributes;
+        Self(
+            (bold as u8) * Self::BOLD
+                | (italic as u8) * Self::ITALIC
+                | (underline as u8) * Self::UNDERLINE
+                | (inverse as u8) * Self::INVERSE,
+        )
+    }
+
+    #[must_use]
+    pub const fn bold(self) -> bool {
+        self.0 & Self::BOLD != 0
+    }
+
+    #[must_use]
+    pub const fn italic(self) -> bool {
+        self.0 & Self::ITALIC != 0
+    }
+
+    #[must_use]
+    pub const fn underline(self) -> bool {
+        self.0 & Self::UNDERLINE != 0
+    }
+
+    #[must_use]
+    pub const fn inverse(self) -> bool {
+        self.0 & Self::INVERSE != 0
+    }
 }
 
 /// An immutable renderer-facing copy of the visible terminal screen.
@@ -102,10 +141,12 @@ impl Terminal {
                     contents: cell.contents(),
                     foreground: cell.fgcolor().into(),
                     background: cell.bgcolor().into(),
-                    bold: cell.bold(),
-                    italic: cell.italic(),
-                    underline: cell.underline(),
-                    inverse: cell.inverse(),
+                    style: CellStyle::new([
+                        cell.bold(),
+                        cell.italic(),
+                        cell.underline(),
+                        cell.inverse(),
+                    ]),
                     wide_continuation: cell.is_wide_continuation(),
                 }));
             }
@@ -126,10 +167,7 @@ fn empty_cell() -> Cell {
         contents: String::new(),
         foreground: TerminalColor::Default,
         background: TerminalColor::Default,
-        bold: false,
-        italic: false,
-        underline: false,
-        inverse: false,
+        style: CellStyle::default(),
         wide_continuation: false,
     }
 }

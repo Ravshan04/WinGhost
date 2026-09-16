@@ -183,7 +183,7 @@ fn terminal_layout(snapshot: &ScreenSnapshot, theme: Theme) -> LayoutJob {
             let cursor = !snapshot.cursor_hidden && snapshot.cursor == (row, column);
             let mut foreground = theme.resolve(cell.foreground, false);
             let mut background = theme.resolve(cell.background, true);
-            if cell.inverse || cursor {
+            if cell.style.inverse() || cursor {
                 std::mem::swap(&mut foreground, &mut background);
             }
             if cursor && cell.contents.is_empty() {
@@ -202,8 +202,8 @@ fn terminal_layout(snapshot: &ScreenSnapshot, theme: Theme) -> LayoutJob {
                     font_id: FontId::new(FONT_SIZE, FontFamily::Monospace),
                     color: rgb(foreground),
                     background: rgb(background),
-                    italics: cell.italic,
-                    underline: if cell.underline {
+                    italics: cell.style.italic(),
+                    underline: if cell.style.underline() {
                         Stroke::new(1.0, rgb(foreground))
                     } else {
                         Stroke::NONE
