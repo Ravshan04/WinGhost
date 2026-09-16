@@ -3,7 +3,7 @@
 use portable_pty::{Child, CommandBuilder, MasterPty, PtySize, native_pty_system};
 use std::fmt;
 use std::io::{Read, Write};
-use std::sync::mpsc::{self, Receiver, Sender, TryRecvError};
+use std::sync::mpsc::{self, Receiver, Sender};
 use std::thread;
 
 /// Errors produced while starting or communicating with a terminal session.
@@ -27,7 +27,12 @@ pub struct Session {
 }
 
 impl Session {
-    /// Starts the preferred Windows PowerShell executable in a pseudoconsole.
+    /// Starts the preferred Windows `PowerShell` executable in a pseudoconsole.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error when the pseudoconsole, shell process, I/O handles, or
+    /// worker threads cannot be created.
     pub fn spawn_default(columns: u16, rows: u16) -> Result<Self, SessionError> {
         let shell = preferred_shell();
         let pty_system = native_pty_system();
@@ -61,7 +66,7 @@ impl Session {
         let (output_sender, output) = mpsc::channel();
         thread::Builder::new()
             .name("winghost-pty-reader".to_owned())
-            .spawn(move || read_output(reader, output_sender))
+            .spawn(move || read_output(reader, &output_sender))
             .map_err(|error| SessionError(format!("Could not start output reader: {error}")))?;
 
         let (input, input_receiver) = mpsc::channel();
@@ -79,6 +84,10 @@ impl Session {
     }
 
     /// Queues keyboard or paste input for the shell.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error after the terminal input worker has stopped.
     pub fn send(&self, bytes: impl Into<Vec<u8>>) -> Result<(), SessionError> {
         self.input
             .send(bytes.into())
@@ -89,16 +98,17 @@ impl Session {
     #[must_use]
     pub fn drain_output(&self) -> Vec<Vec<u8>> {
         let mut chunks = Vec::new();
-        loop {
-            match self.output.try_recv() {
-                Ok(chunk) => chunks.push(chunk),
-                Err(TryRecvError::Empty | TryRecvError::Disconnected) => break,
-            }
+        while let Ok(chunk) = self.output.try_recv() {
+            chunks.push(chunk);
         }
         chunks
     }
 
     /// Resizes the pseudoconsole and notifies the child process.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error when the native pseudoconsole rejects the new size.
     pub fn resize(
         &self,
         columns: u16,
@@ -141,7 +151,7 @@ fn preferred_shell() -> String {
     }
 }
 
-fn read_output(mut reader: Box<dyn Read + Send>, sender: Sender<Vec<u8>>) {
+fn read_output(mut reader: Box<dyn Read + Send>, sender: &Sender<Vec<u8>>) {
     let mut buffer = [0_u8; 16 * 1024];
     loop {
         match reader.read(&mut buffer) {
