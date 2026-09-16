@@ -41,12 +41,20 @@ impl CellStyle {
     #[must_use]
     pub const fn new(attributes: [bool; 4]) -> Self {
         let [bold, italic, underline, inverse] = attributes;
-        Self(
-            (bold as u8) * Self::BOLD
-                | (italic as u8) * Self::ITALIC
-                | (underline as u8) * Self::UNDERLINE
-                | (inverse as u8) * Self::INVERSE,
-        )
+        let mut value = 0;
+        if bold {
+            value |= Self::BOLD;
+        }
+        if italic {
+            value |= Self::ITALIC;
+        }
+        if underline {
+            value |= Self::UNDERLINE;
+        }
+        if inverse {
+            value |= Self::INVERSE;
+        }
+        Self(value)
     }
 
     #[must_use]
