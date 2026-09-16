@@ -1,8 +1,7 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 use eframe::egui::{
-    self, Color32, Event, FontFamily, FontId, Key, RichText, Stroke, TextFormat,
-    text::LayoutJob,
+    self, Color32, Event, FontFamily, FontId, Key, RichText, Stroke, TextFormat, text::LayoutJob,
 };
 use pty_windows::Session;
 use renderer::{Rgb, Theme};
@@ -233,11 +232,31 @@ fn terminal_layout(snapshot: &ScreenSnapshot, theme: Theme) -> LayoutJob {
 fn key_bytes(key: Key, modifiers: egui::Modifiers) -> Option<Vec<u8>> {
     if modifiers.ctrl && !modifiers.shift && !modifiers.alt {
         let letter = match key {
-            Key::A => b'a', Key::B => b'b', Key::C => b'c', Key::D => b'd', Key::E => b'e',
-            Key::F => b'f', Key::G => b'g', Key::H => b'h', Key::I => b'i', Key::J => b'j',
-            Key::K => b'k', Key::L => b'l', Key::M => b'm', Key::N => b'n', Key::O => b'o',
-            Key::P => b'p', Key::Q => b'q', Key::R => b'r', Key::S => b's', Key::T => b't',
-            Key::U => b'u', Key::V => b'v', Key::W => b'w', Key::X => b'x', Key::Y => b'y',
+            Key::A => b'a',
+            Key::B => b'b',
+            Key::C => b'c',
+            Key::D => b'd',
+            Key::E => b'e',
+            Key::F => b'f',
+            Key::G => b'g',
+            Key::H => b'h',
+            Key::I => b'i',
+            Key::J => b'j',
+            Key::K => b'k',
+            Key::L => b'l',
+            Key::M => b'm',
+            Key::N => b'n',
+            Key::O => b'o',
+            Key::P => b'p',
+            Key::Q => b'q',
+            Key::R => b'r',
+            Key::S => b's',
+            Key::T => b't',
+            Key::U => b'u',
+            Key::V => b'v',
+            Key::W => b'w',
+            Key::X => b'x',
+            Key::Y => b'y',
             Key::Z => b'z',
             _ => return None,
         };
