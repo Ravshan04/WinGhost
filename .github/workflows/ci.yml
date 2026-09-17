@@ -23,8 +23,6 @@ jobs:
           components: clippy,rustfmt
       - name: Cache Rust build
         uses: Swatinem/rust-cache@v2
-      - name: Resolve dependency lockfile
-        run: cargo generate-lockfile
       - name: Check formatting
         run: cargo fmt --all -- --check
       - name: Lint
@@ -33,9 +31,3 @@ jobs:
         run: cargo test --workspace --locked
       - name: Build
         run: cargo build --workspace --locked
-      - name: Preserve resolved dependency lockfile
-        uses: actions/upload-artifact@v4
-        with:
-          name: cargo-lock-font-fix
-          path: Cargo.lock
-          if-no-files-found: error
