@@ -49,11 +49,7 @@ struct Pane {
 impl Pane {
     fn new(profile: ShellProfile, scrollback_lines: usize) -> Self {
         let mut pane = Self {
-            terminal: Terminal::with_scrollback(
-                INITIAL_COLUMNS,
-                INITIAL_ROWS,
-                scrollback_lines,
-            ),
+            terminal: Terminal::with_scrollback(INITIAL_COLUMNS, INITIAL_ROWS, scrollback_lines),
             session: None,
             profile,
             status: String::new(),
@@ -65,8 +61,7 @@ impl Pane {
     }
 
     fn restart(&mut self) {
-        self.terminal =
-            Terminal::with_scrollback(self.size.0, self.size.1, self.scrollback_lines);
+        self.terminal = Terminal::with_scrollback(self.size.0, self.size.1, self.scrollback_lines);
         match Session::spawn_profile(self.profile, self.size.0, self.size.1) {
             Ok(session) => {
                 self.session = Some(session);
