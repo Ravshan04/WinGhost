@@ -65,11 +65,8 @@ impl Pane {
     }
 
     fn restart(&mut self) {
-        self.terminal = Terminal::with_scrollback(
-            self.size.0,
-            self.size.1,
-            self.scrollback_lines,
-        );
+        self.terminal =
+            Terminal::with_scrollback(self.size.0, self.size.1, self.scrollback_lines);
         match Session::spawn_profile(self.profile, self.size.0, self.size.1) {
             Ok(session) => {
                 self.session = Some(session);
@@ -336,11 +333,18 @@ impl WinGhostApp {
         ui.horizontal(|ui| {
             for (index, tab) in self.tabs.iter().enumerate() {
                 let label = format!("{}  [{}]", tab.title, tab.panes.len());
-                if ui.selectable_label(index == self.active_tab, label).clicked() {
+                if ui
+                    .selectable_label(index == self.active_tab, label)
+                    .clicked()
+                {
                     selected = Some(index);
                 }
             }
-            if ui.button("+").on_hover_text("New tab (Ctrl+Shift+T)").clicked() {
+            if ui
+                .button("+")
+                .on_hover_text("New tab (Ctrl+Shift+T)")
+                .clicked()
+            {
                 selected = Some(self.tabs.len());
             }
         });
@@ -360,7 +364,11 @@ impl WinGhostApp {
             );
             ui.separator();
             ui.label(self.active_pane().profile.display_name());
-            ui.label(format!("{} × {}", self.active_pane().size.0, self.active_pane().size.1));
+            ui.label(format!(
+                "{} × {}",
+                self.active_pane().size.0,
+                self.active_pane().size.1
+            ));
             let offset = self.active_pane().terminal.scrollback_offset();
             if offset > 0 {
                 ui.label(format!("Scrollback: {offset}"));
@@ -405,7 +413,9 @@ impl WinGhostApp {
         match tab.split {
             SplitDirection::Vertical => {
                 ui.columns(tab.panes.len(), |columns| {
-                    for (index, (column, pane)) in columns.iter_mut().zip(&mut tab.panes).enumerate() {
+                    for (index, (column, pane)) in
+                        columns.iter_mut().zip(&mut tab.panes).enumerate()
+                    {
                         if show_pane(column, pane, theme, font_size, index == tab.active_pane) {
                             clicked = Some(index);
                         }
@@ -413,7 +423,8 @@ impl WinGhostApp {
                 });
             }
             SplitDirection::Horizontal => {
-                let pane_height = ui.available_height() / tab.panes.len() as f32;
+                let pane_count = u16::try_from(tab.panes.len()).unwrap_or(1);
+                let pane_height = ui.available_height() / f32::from(pane_count);
                 let width = ui.available_width();
                 for (index, pane) in tab.panes.iter_mut().enumerate() {
                     ui.allocate_ui(egui::vec2(width, pane_height), |pane_ui| {
@@ -502,7 +513,11 @@ fn terminal_layout(snapshot: &ScreenSnapshot, theme: Theme, font_size: f32) -> L
             if cursor && cell.contents.is_empty() {
                 background = theme.cursor;
             }
-            let contents = if cell.contents.is_empty() { " " } else { &cell.contents };
+            let contents = if cell.contents.is_empty() {
+                " "
+            } else {
+                &cell.contents
+            };
             job.append(
                 contents,
                 0.0,
@@ -540,25 +555,62 @@ fn terminal_layout(snapshot: &ScreenSnapshot, theme: Theme, font_size: f32) -> L
 fn key_bytes(key: Key, modifiers: egui::Modifiers) -> Option<Vec<u8>> {
     if modifiers.ctrl && !modifiers.shift && !modifiers.alt {
         let letter = match key {
-            Key::A => b'a', Key::B => b'b', Key::C => b'c', Key::D => b'd', Key::E => b'e',
-            Key::F => b'f', Key::G => b'g', Key::H => b'h', Key::I => b'i', Key::J => b'j',
-            Key::K => b'k', Key::L => b'l', Key::M => b'm', Key::N => b'n', Key::O => b'o',
-            Key::P => b'p', Key::Q => b'q', Key::R => b'r', Key::S => b's', Key::T => b't',
-            Key::U => b'u', Key::V => b'v', Key::W => b'w', Key::X => b'x', Key::Y => b'y',
+            Key::A => b'a',
+            Key::B => b'b',
+            Key::C => b'c',
+            Key::D => b'd',
+            Key::E => b'e',
+            Key::F => b'f',
+            Key::G => b'g',
+            Key::H => b'h',
+            Key::I => b'i',
+            Key::J => b'j',
+            Key::K => b'k',
+            Key::L => b'l',
+            Key::M => b'm',
+            Key::N => b'n',
+            Key::O => b'o',
+            Key::P => b'p',
+            Key::Q => b'q',
+            Key::R => b'r',
+            Key::S => b's',
+            Key::T => b't',
+            Key::U => b'u',
+            Key::V => b'v',
+            Key::W => b'w',
+            Key::X => b'x',
+            Key::Y => b'y',
             Key::Z => b'z',
             _ => return None,
         };
         return Some(vec![letter & 0x1f]);
     }
     let sequence: &[u8] = match key {
-        Key::Enter => b"\r", Key::Backspace => b"\x7f", Key::Tab => b"\t", Key::Escape => b"\x1b",
-        Key::ArrowUp => b"\x1b[A", Key::ArrowDown => b"\x1b[B", Key::ArrowRight => b"\x1b[C",
-        Key::ArrowLeft => b"\x1b[D", Key::Home => b"\x1b[H", Key::End => b"\x1b[F",
-        Key::Insert => b"\x1b[2~", Key::Delete => b"\x1b[3~", Key::PageUp => b"\x1b[5~",
-        Key::PageDown => b"\x1b[6~", Key::F1 => b"\x1bOP", Key::F2 => b"\x1bOQ",
-        Key::F3 => b"\x1bOR", Key::F4 => b"\x1bOS", Key::F5 => b"\x1b[15~",
-        Key::F6 => b"\x1b[17~", Key::F7 => b"\x1b[18~", Key::F8 => b"\x1b[19~",
-        Key::F9 => b"\x1b[20~", Key::F10 => b"\x1b[21~", Key::F11 => b"\x1b[23~",
+        Key::Enter => b"\r",
+        Key::Backspace => b"\x7f",
+        Key::Tab => b"\t",
+        Key::Escape => b"\x1b",
+        Key::ArrowUp => b"\x1b[A",
+        Key::ArrowDown => b"\x1b[B",
+        Key::ArrowRight => b"\x1b[C",
+        Key::ArrowLeft => b"\x1b[D",
+        Key::Home => b"\x1b[H",
+        Key::End => b"\x1b[F",
+        Key::Insert => b"\x1b[2~",
+        Key::Delete => b"\x1b[3~",
+        Key::PageUp => b"\x1b[5~",
+        Key::PageDown => b"\x1b[6~",
+        Key::F1 => b"\x1bOP",
+        Key::F2 => b"\x1bOQ",
+        Key::F3 => b"\x1bOR",
+        Key::F4 => b"\x1bOS",
+        Key::F5 => b"\x1b[15~",
+        Key::F6 => b"\x1b[17~",
+        Key::F7 => b"\x1b[18~",
+        Key::F8 => b"\x1b[19~",
+        Key::F9 => b"\x1b[20~",
+        Key::F10 => b"\x1b[21~",
+        Key::F11 => b"\x1b[23~",
         Key::F12 => b"\x1b[24~",
         _ => return None,
     };

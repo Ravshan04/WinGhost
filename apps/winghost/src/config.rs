@@ -73,6 +73,12 @@ impl AppConfig {
             .unwrap_or_default()
     }
 
+    /// Saves the current settings and returns their on-disk path.
+    ///
+    /// # Errors
+    ///
+    /// Returns a user-facing message when the settings directory cannot be
+    /// resolved or the configuration cannot be serialized or written.
     pub fn save(&self) -> Result<PathBuf, String> {
         let path = config_path().ok_or_else(|| "APPDATA is not available".to_owned())?;
         let parent = path
@@ -82,8 +88,7 @@ impl AppConfig {
             .map_err(|error| format!("Could not create settings folder: {error}"))?;
         let text = toml::to_string_pretty(self)
             .map_err(|error| format!("Could not serialize settings: {error}"))?;
-        std::fs::write(&path, text)
-            .map_err(|error| format!("Could not save settings: {error}"))?;
+        std::fs::write(&path, text).map_err(|error| format!("Could not save settings: {error}"))?;
         Ok(path)
     }
 }
