@@ -501,6 +501,8 @@ fn terminal_layout(snapshot: &ScreenSnapshot, theme: Theme, font_size: f32) -> L
     job.break_on_newline = true;
 
     for row in 0..snapshot.rows {
+        let mut run_text = String::new();
+        let mut run_format = None;
         for column in 0..snapshot.columns {
             let Some(cell) = snapshot.cell(row, column) else {
                 continue;
@@ -522,23 +524,30 @@ fn terminal_layout(snapshot: &ScreenSnapshot, theme: Theme, font_size: f32) -> L
             } else {
                 &cell.contents
             };
-            job.append(
-                contents,
-                0.0,
-                TextFormat {
-                    font_id: FontId::new(font_size, FontFamily::Monospace),
-                    color: rgb(foreground),
-                    background: rgb(background),
-                    italics: cell.style.italic(),
-                    underline: if cell.style.underline() {
-                        Stroke::new(1.0, rgb(foreground))
-                    } else {
-                        Stroke::NONE
-                    },
-                    line_height: Some(line_height),
-                    ..Default::default()
+            let format = TextFormat {
+                font_id: FontId::new(font_size, FontFamily::Monospace),
+                color: rgb(foreground),
+                background: rgb(background),
+                italics: cell.style.italic(),
+                underline: if cell.style.underline() {
+                    Stroke::new(1.0, rgb(foreground))
+                } else {
+                    Stroke::NONE
                 },
-            );
+                line_height: Some(line_height),
+                ..Default::default()
+            };
+
+            if run_format.as_ref() != Some(&format)
+                && let Some(previous) = run_format.replace(format)
+            {
+                job.append(&run_text, 0.0, previous);
+                run_text.clear();
+            }
+            run_text.push_str(contents);
+        }
+        if let Some(format) = run_format {
+            job.append(&run_text, 0.0, format);
         }
         if row + 1 < snapshot.rows {
             job.append(
