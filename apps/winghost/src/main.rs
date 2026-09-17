@@ -653,4 +653,13 @@ mod tests {
             assert!(ui.memory(|memory| memory.has_focus(response.id)));
         });
     }
+
+    #[test]
+    fn bundled_fonts_are_available() {
+        let fonts = egui::FontDefinitions::default();
+        assert!(
+            !fonts.font_data.is_empty(),
+            "the Windows package must include fonts for UI and terminal text"
+        );
+    }
 }
