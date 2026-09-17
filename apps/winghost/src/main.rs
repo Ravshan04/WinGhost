@@ -642,8 +642,9 @@ const fn rgb(color: Rgb) -> Color32 {
 
 #[cfg(test)]
 mod tests {
-    use super::claim_terminal_focus;
+    use super::{ThemeChoice, claim_terminal_focus, terminal_layout};
     use eframe::egui;
+    use terminal_core::Terminal;
 
     #[test]
     fn clicking_terminal_claims_keyboard_focus() {
@@ -660,6 +661,19 @@ mod tests {
         assert!(
             !fonts.font_data.is_empty(),
             "the Windows package must include fonts for UI and terminal text"
+        );
+    }
+
+    #[test]
+    fn terminal_layout_coalesces_adjacent_cells() {
+        let mut terminal = Terminal::new(20, 1);
+        terminal.process(b"abc");
+        let snapshot = terminal.snapshot();
+        let job = terminal_layout(&snapshot, ThemeChoice::Midnight.theme(), 15.0);
+
+        assert!(
+            job.sections.len() <= 3,
+            "one row should be shaped as text runs, not as one section per cell"
         );
     }
 }
