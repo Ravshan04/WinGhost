@@ -488,7 +488,11 @@ fn show_pane(
     clicked
 }
 
-fn claim_terminal_focus(_response: &egui::Response, _clicked: bool) {}
+fn claim_terminal_focus(response: &egui::Response, clicked: bool) {
+    if clicked {
+        response.request_focus();
+    }
+}
 
 fn terminal_layout(snapshot: &ScreenSnapshot, theme: Theme, font_size: f32) -> LayoutJob {
     let line_height = font_size * 1.27;
