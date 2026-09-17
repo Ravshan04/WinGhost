@@ -482,8 +482,13 @@ fn show_pane(
             ui.add(egui::Label::new(job).selectable(false));
         })
         .response;
-    response.interact(egui::Sense::click()).clicked()
+    let response = response.interact(egui::Sense::click());
+    let clicked = response.clicked();
+    claim_terminal_focus(&response, clicked);
+    clicked
 }
+
+fn claim_terminal_focus(_response: &egui::Response, _clicked: bool) {}
 
 fn terminal_layout(snapshot: &ScreenSnapshot, theme: Theme, font_size: f32) -> LayoutJob {
     let line_height = font_size * 1.27;
@@ -629,4 +634,19 @@ fn bounded_cell_count(available: f32, cell_size: f32, minimum: u16, maximum: u16
 
 const fn rgb(color: Rgb) -> Color32 {
     Color32::from_rgb(color.0, color.1, color.2)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::claim_terminal_focus;
+    use eframe::egui;
+
+    #[test]
+    fn clicking_terminal_claims_keyboard_focus() {
+        egui::__run_test_ui(|ui| {
+            let response = ui.allocate_response(egui::vec2(320.0, 200.0), egui::Sense::click());
+            claim_terminal_focus(&response, true);
+            assert!(ui.memory(|memory| memory.has_focus(response.id)));
+        });
+    }
 }
