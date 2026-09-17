@@ -6,6 +6,8 @@ use std::io::{Read, Write};
 use std::sync::mpsc::{self, Receiver, Sender};
 use std::thread;
 
+const CONPTY_STARTUP_RESPONSE: &[u8] = b"\x1b[1;1R";
+
 /// Errors produced while starting or communicating with a terminal session.
 #[derive(Debug)]
 pub struct SessionError(String);
@@ -140,12 +142,17 @@ impl Session {
             .spawn(move || write_input(writer, input_receiver))
             .map_err(|error| SessionError(format!("Could not start input writer: {error}")))?;
 
-        Ok(Self {
+        let session = Self {
             master: pair.master,
             input,
             output,
             child,
-        })
+        };
+
+        // Recent Windows ConHost builds wait for a cursor-position response
+        // before relaying the initial shell output through ConPTY.
+        session.send(CONPTY_STARTUP_RESPONSE.to_vec())?;
+        Ok(session)
     }
 
     /// Queues keyboard or paste input for the shell.
