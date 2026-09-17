@@ -7,7 +7,7 @@ repository.workspace = true
 rust-version.workspace = true
 
 [dependencies]
-eframe = { version = "0.31.1", default-features = false, features = ["glow", "wayland", "x11"] }
+eframe = { version = "0.31.1", default-features = false, features = ["default_fonts", "glow", "wayland", "x11"] }
 pty-windows = { path = "../../crates/pty-windows" }
 renderer = { path = "../../crates/renderer" }
 serde = { version = "1.0", features = ["derive"] }
